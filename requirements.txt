@@ -18,7 +18,9 @@ tiktoken>=0.7.0
 
 # Document loading / splitting (Phase 3+)
 pypdf>=4.2.0
+langchain-text-splitters>=0.3.0
 beautifulsoup4>=4.12.0
+reportlab>=4.0.0   # generates a real-text sample PDF for Phase 3 Topic 07's demo
 
 # Tools used in examples
 duckduckgo-search>=6.2.0
