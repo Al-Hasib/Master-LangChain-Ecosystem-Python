@@ -19,7 +19,7 @@ on screen.
 |---|---|---|
 | 0 — Foundations | [`phase-0-foundations/`](phase-0-foundations/) | ✅ Fully built (doc + code) |
 | 1 — LangChain Fundamentals | [`phase-1-langchain-fundamentals/`](phase-1-langchain-fundamentals/) | ✅ Fully built (doc + code) |
-| 2 — Integrations | [`phase-2-integrations/`](phase-2-integrations/) | 🗒️ Topic list only |
+| 2 — Integrations | [`phase-2-integrations/`](phase-2-integrations/) | ✅ Fully built (doc + code) |
 | 3 — RAG Fundamentals | [`phase-3-rag-fundamentals/`](phase-3-rag-fundamentals/) | 🗒️ Topic list only |
 | 4 — Advanced RAG | [`phase-4-advanced-rag/`](phase-4-advanced-rag/) | 🗒️ Topic list only |
 | 5 — Agentic RAG | [`phase-5-agentic-rag/`](phase-5-agentic-rag/) | 🗒️ Topic list only |

@@ -12,6 +12,7 @@ langsmith>=0.1.100
 
 # Embeddings / vector stores (Phase 0-4)
 chromadb>=0.5.0
+langchain-chroma>=0.1.4
 faiss-cpu>=1.8.0
 tiktoken>=0.7.0
 
@@ -21,6 +22,10 @@ beautifulsoup4>=4.12.0
 
 # Tools used in examples
 duckduckgo-search>=6.2.0
+
+# Phase 2 — optional provider integrations (install only the ones you'll demo)
+# langchain-google-genai>=2.0.0   # Gemini (Topic 02)
+# langchain-ollama>=0.2.0         # local models (Topic 03) — needs Ollama running locally
 
 # Later phases (API / production) — install when you reach Phase 10
 # fastapi>=0.111.0
