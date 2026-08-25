@@ -20,18 +20,38 @@ on screen.
 | 0 — Foundations | [`phase-0-foundations/`](phase-0-foundations/) | ✅ Fully built (doc + code) |
 | 1 — LangChain Fundamentals | [`phase-1-langchain-fundamentals/`](phase-1-langchain-fundamentals/) | ✅ Fully built (doc + code) |
 | 2 — Integrations | [`phase-2-integrations/`](phase-2-integrations/) | ✅ Fully built (doc + code) |
-| 3 — RAG Fundamentals | [`phase-3-rag-fundamentals/`](phase-3-rag-fundamentals/) | 🗒️ Topic list only |
-| 4 — Advanced RAG | [`phase-4-advanced-rag/`](phase-4-advanced-rag/) | 🗒️ Topic list only |
-| 5 — Agentic RAG | [`phase-5-agentic-rag/`](phase-5-agentic-rag/) | 🗒️ Topic list only |
-| 6 — LangGraph | [`phase-6-langgraph/`](phase-6-langgraph/) | 🗒️ Topic list only |
-| 7 — Advanced Agents | [`phase-7-advanced-agents/`](phase-7-advanced-agents/) | 🗒️ Topic list only |
-| 8 — Deep Agents | [`phase-8-deep-agents/`](phase-8-deep-agents/) | 🗒️ Topic list only |
-| 9 — LangSmith | [`phase-9-langsmith/`](phase-9-langsmith/) | 🗒️ Topic list only |
-| 10 — Production AI Engineering | [`phase-10-production/`](phase-10-production/) | 🗒️ Topic list only |
-| Capstones | [`capstones/`](capstones/) | 🗒️ Topic list only |
+| 3 — RAG Fundamentals | [`phase-3-rag-fundamentals/`](phase-3-rag-fundamentals/) | ✅ Fully built (doc + code) |
+| 4 — Advanced RAG | [`phase-4-advanced-rag/`](phase-4-advanced-rag/) | ✅ Fully built (doc + code) |
+| 5 — Agentic RAG | [`phase-5-agentic-rag/`](phase-5-agentic-rag/) | ✅ Fully built (doc + code) |
+| 6 — LangGraph | [`phase-6-langgraph/`](phase-6-langgraph/) | ✅ Fully built (doc + code) |
+| 7 — Advanced Agents | [`phase-7-advanced-agents/`](phase-7-advanced-agents/) | ✅ Fully built (doc + code) |
+| 8 — Deep Agents | [`phase-8-deep-agents/`](phase-8-deep-agents/) | ✅ Fully built (doc + code) |
+| 9 — LangSmith | [`phase-9-langsmith/`](phase-9-langsmith/) | ✅ Fully built (doc + code) |
+| 10 — Production AI Engineering | [`phase-10-production/`](phase-10-production/) | ✅ Fully built (doc + code) |
+| Capstones | [`capstones/`](capstones/) | ✅ Fully built (doc + code) |
 
-To build out a "topic list only" phase, ask for it by name — it follows the same
-`doc.md` + `code.py` per topic pattern as Phases 0–1.
+Every phase and capstone now has a complete `doc.md` + `code.py` per topic — 99
+runnable examples in total, all syntax-verified with `python -m py_compile`.
+
+### A few things worth knowing before you run everything
+
+- **Some packages moved between major versions.** LangChain's v1 reorganization split
+  several retrievers/storage classes out of core `langchain` into a new
+  `langchain-classic` package (Phase 4 depends on it), and Deep Agents is its own
+  `deepagents` package (Phase 8). `requirements.txt` is updated for this — just
+  `pip install -r requirements.txt` and everything needed is included.
+- **Phase 6 (LangGraph), Phase 8 (Deep Agents), and Phase 9 (LangSmith)** move the
+  fastest of any part of this ecosystem. Every API used in those phases was verified
+  against current docs and/or the actually-installed package source (not written from
+  memory) — see each phase's own topic docs for verification notes on trickier calls
+  (checkpointers, interrupts, the functional API, `TodoListMiddleware`, tracing env vars).
+- **Phase 10 topics needing Postgres/Redis/Docker** (Topics 06 and 10) write real
+  client code but can't fully execute in every environment — they degrade to clear
+  setup instructions (e.g. the exact `docker run` command) instead of crashing when
+  that infra isn't running locally.
+- Capstone 04 intentionally uses a hand-rolled `create_agent`-based deep-research
+  pattern rather than the real `deepagents` package, to avoid depending on it before
+  Phase 8 introduces it on its own terms — see the capstone's doc.md.
 
 ## Learning progression (problem-centric, not technology-centric)
 

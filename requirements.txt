@@ -7,9 +7,10 @@ langchain-core>=0.3.0
 deepagents>=0.7.0   # Phase 8 — create_deep_agent, TodoListMiddleware, filesystem/subagent tools
 langchain-openai>=0.2.0
 langchain-anthropic>=0.2.0
-langchain-community>=0.3.0
+langchain-community>=0.4.2
+langchain-classic>=1.0.8   # Phase 4 — retrievers/storage moved out of core langchain in v1 (MultiQueryRetriever, EnsembleRetriever, ParentDocumentRetriever, InMemoryStore, ...)
 langgraph>=1.0.0   # Phase 6 relies on InMemorySaver, interrupt()/Command, RetryPolicy, @entrypoint/@task
-langsmith>=0.1.100
+langsmith>=0.8.0   # bumped from 0.1.100: Phase 9 verified against installed 0.8.5
 
 # Embeddings / vector stores (Phase 0-4)
 chromadb>=0.5.0
@@ -25,6 +26,7 @@ reportlab>=4.0.0   # generates a real-text sample PDF for Phase 3 Topic 07's dem
 
 # Tools used in examples
 duckduckgo-search>=6.2.0
+rank-bm25>=0.2.2   # Phase 4 — scoring backend for BM25Retriever (hybrid/keyword search)
 
 # Phase 2 — optional provider integrations (install only the ones you'll demo)
 # langchain-google-genai>=2.0.0   # Gemini (Topic 02)
