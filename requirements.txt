@@ -2,12 +2,13 @@
 python-dotenv>=1.0.1
 
 # LangChain ecosystem
-langchain>=0.3.0
+langchain>=1.0.0   # bumped from 0.3.0: Phase 6/8 rely on current langchain.agents.middleware API
 langchain-core>=0.3.0
+deepagents>=0.7.0   # Phase 8 — create_deep_agent, TodoListMiddleware, filesystem/subagent tools
 langchain-openai>=0.2.0
 langchain-anthropic>=0.2.0
 langchain-community>=0.3.0
-langgraph>=0.2.0
+langgraph>=1.0.0   # Phase 6 relies on InMemorySaver, interrupt()/Command, RetryPolicy, @entrypoint/@task
 langsmith>=0.1.100
 
 # Embeddings / vector stores (Phase 0-4)
@@ -29,8 +30,8 @@ duckduckgo-search>=6.2.0
 # langchain-google-genai>=2.0.0   # Gemini (Topic 02)
 # langchain-ollama>=0.2.0         # local models (Topic 03) — needs Ollama running locally
 
-# Later phases (API / production) — install when you reach Phase 10
-# fastapi>=0.111.0
-# uvicorn>=0.30.0
-# psycopg[binary]>=3.2.0
-# redis>=5.0.0
+# Phase 10 — production API layer
+fastapi>=0.111.0
+uvicorn>=0.30.0
+psycopg[binary]>=3.2.0
+redis>=5.0.0
