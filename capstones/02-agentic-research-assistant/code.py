@@ -26,10 +26,10 @@ try:
     from langchain.agents import create_agent
     from langchain.chat_models import init_chat_model
     from langchain.tools import tool
-    from langchain_chroma import Chroma
     from langchain_core.documents import Document
     from langchain_core.messages import ToolMessage
     from langchain_openai import OpenAIEmbeddings
+    from langchain_qdrant import QdrantVectorStore
     from pydantic import BaseModel, Field
 except ImportError:
     sys.exit("Missing dependency. Run: pip install -r ../requirements.txt")
@@ -82,16 +82,21 @@ class RewrittenQuery(BaseModel):
     reason: str = Field(description="One short sentence on what was unclear before.")
 
 
-def build_vector_store() -> Chroma:
+def build_vector_store() -> QdrantVectorStore:
     documents = [
         Document(page_content=text, metadata={"source_name": name})
         for name, text in INTERNAL_DOCS
     ]
     embeddings = OpenAIEmbeddings(model="text-embedding-3-small")
-    return Chroma.from_documents(documents, embedding=embeddings)
+    return QdrantVectorStore.from_documents(
+        documents,
+        embedding=embeddings,
+        location=":memory:",
+        collection_name="nimbuscloud_engineering_docs",
+    )
 
 
-def build_tools(store: Chroma):
+def build_tools(store: QdrantVectorStore):
     # Phase 5 Topic 02: wrap a retriever as a tool the agent calls by choice.
     @tool
     def vector_search(query: str) -> str:

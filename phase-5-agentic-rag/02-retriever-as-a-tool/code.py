@@ -1,7 +1,7 @@
 """
 Phase 5 - Topic 02: Retriever as a Tool
 
-Wraps a Chroma retriever with create_retriever_tool (verified import path:
+Wraps a Qdrant retriever with create_retriever_tool (verified import path:
 langchain_core.tools.retriever) instead of hand-writing the @tool wrapper from
 Topic 01, then gives an agent ONLY that tool.
 
@@ -37,13 +37,18 @@ def require_keys() -> None:
 
 
 def build_retriever():
-    from langchain_chroma import Chroma
     from langchain_core.documents import Document
     from langchain_openai import OpenAIEmbeddings
+    from langchain_qdrant import QdrantVectorStore
 
     documents = [Document(page_content=text) for text in KNOWLEDGE_BASE]
     embeddings = OpenAIEmbeddings(model="text-embedding-3-small")
-    store = Chroma.from_documents(documents, embedding=embeddings)
+    store = QdrantVectorStore.from_documents(
+        documents,
+        embedding=embeddings,
+        location=":memory:",
+        collection_name="aurora_policies_retriever_tool",
+    )
     return store.as_retriever(search_kwargs={"k": 2})
 
 

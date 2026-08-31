@@ -12,13 +12,15 @@ node.
 ## Concept
 
 **Deep Agents + RAG:** a retriever is just another `@tool` in the `tools=` list — nothing
-deep-agent-specific about it. Reusing the small in-code Chroma pattern from Phase 0 Topic
+deep-agent-specific about it. Reusing the small in-code Qdrant pattern from Phase 0 Topic
 06 / Phase 2 Topic 06:
 
 ```python
-from langchain_chroma import Chroma
+from langchain_qdrant import QdrantVectorStore
 
-vector_store = Chroma.from_documents(documents, embedding=embeddings)
+vector_store = QdrantVectorStore.from_documents(
+    documents, embedding=embeddings, location=":memory:", collection_name="company_policy_kb",
+)
 
 @tool
 def search_knowledge_base(query: str) -> str:
@@ -50,7 +52,7 @@ composition (illustrative, commented) since Phase 6 owns real `StateGraph` code:
 
 ## Minimal code
 
-`code.py` builds a tiny in-memory Chroma store (reusing the Phase 2 Topic 06 pattern),
+`code.py` builds a tiny in-memory Qdrant store (reusing the Phase 2 Topic 06 pattern),
 wraps it as a retriever tool, gives it to a `create_deep_agent`, and asks a question that
 should trigger retrieval — then prints which tool the agent chose to make the "just
 another tool" point concrete.

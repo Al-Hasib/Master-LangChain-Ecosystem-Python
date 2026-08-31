@@ -46,7 +46,7 @@ step somewhere inside it, or an agent with workflow-like tools.
 
 `code.py` implements the same question two ways: as a fixed RAG workflow (always
 retrieve, then generate) and as a one-step agent decision (let the model decide whether
-retrieval is even needed for a given question) — using the Chroma collection pattern
+retrieval is even needed for a given question) — using the Qdrant collection pattern
 from Topic 06.
 
 ## Production notes

@@ -22,7 +22,7 @@ Every arrow is a topic you already built:
 2. **Splitter** (Topic 03) — `RecursiveCharacterTextSplitter` chunks each page,
    *carrying that page's metadata onto every chunk it produces* — this is what makes
    page-level citation possible later.
-3. **Embeddings + Vector DB** (Topic 04) — `OpenAIEmbeddings` + `Chroma.from_documents`.
+3. **Embeddings + Vector DB** (Topic 04) — `OpenAIEmbeddings` + `QdrantVectorStore.from_documents`.
 4. **Retriever** (Topic 05) — `.as_retriever()`, top-k.
 5. **Prompt + LLM** (Phase 1 Topic 03) — the same `prompt | model` LCEL chain, with
    retrieved chunks formatted into the context, each one tagged with its source page.

@@ -43,7 +43,7 @@ def main() -> None:
     def lookup_fact(claim: str) -> str:
         """Check a claim against a small offline reference of known facts."""
         known_true = [
-            "chroma is open source",
+            "qdrant is open source",
             "faiss was built by meta",
             "duckduckgo search requires no api key",
         ]

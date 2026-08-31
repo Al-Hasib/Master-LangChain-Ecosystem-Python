@@ -49,9 +49,9 @@ def main() -> None:
             "2) fill in your key\n3) re-run"
         )
     try:
-        from langchain_chroma import Chroma
         from langchain_core.documents import Document
         from langchain_openai import OpenAIEmbeddings
+        from langchain_qdrant import QdrantVectorStore
     except ImportError:
         sys.exit("Missing dependency. Run: pip install -r ../../requirements.txt")
 
@@ -59,7 +59,12 @@ def main() -> None:
     documents = [
         Document(page_content=text, metadata={"id": doc_id}) for doc_id, text in CORPUS
     ]
-    vector_store = Chroma.from_documents(documents, embedding=embeddings)
+    vector_store = QdrantVectorStore.from_documents(
+        documents,
+        embedding=embeddings,
+        location=":memory:",
+        collection_name="phase3_topic08_rag_evaluation",
+    )
     retriever = vector_store.as_retriever(search_kwargs={"k": K})
 
     print(f"Retrieval evaluation (precision@{K}) over {len(LABELED_QUERIES)} labeled query(ies):\n")

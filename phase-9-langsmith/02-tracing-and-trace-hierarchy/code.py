@@ -47,16 +47,21 @@ def main() -> None:
     require_openai_key()
     require_langsmith_key()
     try:
-        from langchain_chroma import Chroma
         from langchain_core.documents import Document
         from langchain_openai import ChatOpenAI, OpenAIEmbeddings
+        from langchain_qdrant import QdrantVectorStore
         from langsmith import traceable
     except ImportError:
         sys.exit("Missing dependency. Run: pip install -r ../../requirements.txt")
 
     embeddings = OpenAIEmbeddings(model="text-embedding-3-small")
     documents = [Document(page_content=text) for text in DOCS_TEXT]
-    vectorstore = Chroma.from_documents(documents, embedding=embeddings)
+    vectorstore = QdrantVectorStore.from_documents(
+        documents,
+        embedding=embeddings,
+        location=":memory:",
+        collection_name="langsmith_tracing_demo",
+    )
     model = ChatOpenAI(model="gpt-4o-mini", temperature=0)
 
     # run_type tells the LangSmith UI how to render/aggregate this node
@@ -85,7 +90,7 @@ def main() -> None:
     print("--- Trace tree that was just created ---")
     print("rag_answer (root)")
     print("  |- retrieve (child, run_type=retriever)")
-    print("  |    |- Chroma similarity_search (auto-traced)")
+    print("  |    |- Qdrant similarity_search (auto-traced)")
     print("  |- ChatOpenAI (child, run_type=llm, auto-traced)")
     print()
     project = os.getenv("LANGCHAIN_PROJECT", "langchain-ecosystem-course")

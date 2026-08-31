@@ -1,7 +1,7 @@
 """
 Phase 2 - Topic 06: Vector Store Integration Pattern
 
-Same documents, same embeddings, two backends (Chroma and FAISS) - identical
+Same documents, same embeddings, two backends (Qdrant and FAISS) - identical
 .from_documents() / .similarity_search() calls either way.
 
 Run:
@@ -40,17 +40,22 @@ def main() -> None:
     embeddings = OpenAIEmbeddings(model="text-embedding-3-small")
     documents = [Document(page_content=text) for text in DOCS_TEXT]
 
-    # --- Chroma ---
+    # --- Qdrant ---
     try:
-        from langchain_chroma import Chroma
+        from langchain_qdrant import QdrantVectorStore
 
-        chroma_store = Chroma.from_documents(documents, embedding=embeddings)
-        results = chroma_store.similarity_search(QUERY, k=2)
-        print("[chroma] top matches:")
+        qdrant_store = QdrantVectorStore.from_documents(
+            documents,
+            embedding=embeddings,
+            location=":memory:",
+            collection_name="phase2_vector_store_pattern",
+        )
+        results = qdrant_store.similarity_search(QUERY, k=2)
+        print("[qdrant] top matches:")
         for doc in results:
             print(f"  - {doc.page_content}")
     except ImportError:
-        print("[skipped] chroma: run `pip install langchain-chroma`")
+        print("[skipped] qdrant: run `pip install langchain-qdrant`")
 
     # --- FAISS ---
     try:

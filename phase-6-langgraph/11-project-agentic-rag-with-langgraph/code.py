@@ -4,7 +4,7 @@ Phase 6 - Topic 11 (Project): Agentic RAG with LangGraph
 Run:
     python code.py
 
-Builds a small in-code Chroma knowledge base, then wires an explicit graph:
+Builds a small in-code Qdrant knowledge base, then wires an explicit graph:
 retrieve -> grade_documents -> (generate | rewrite_query loop back to retrieve).
 Mirrors Phase 5's agentic RAG agent loop as an inspectable graph instead.
 """
@@ -34,7 +34,7 @@ def main() -> None:
 
         from langchain_core.documents import Document
         from langchain.chat_models import init_chat_model
-        from langchain_chroma import Chroma
+        from langchain_qdrant import QdrantVectorStore
         from langchain_openai import OpenAIEmbeddings
         from langgraph.graph import StateGraph, START, END
     except ImportError:
@@ -56,7 +56,12 @@ def main() -> None:
     documents = [Document(page_content=text) for text in knowledge_base]
 
     embeddings = OpenAIEmbeddings(model="text-embedding-3-small")
-    vector_store = Chroma.from_documents(documents, embedding=embeddings)
+    vector_store = QdrantVectorStore.from_documents(
+        documents,
+        embedding=embeddings,
+        location=":memory:",
+        collection_name="nimbus_support_docs",
+    )
     retriever = vector_store.as_retriever(search_kwargs={"k": 2})
 
     model = init_chat_model("gpt-4o-mini", model_provider="openai", temperature=0)

@@ -33,9 +33,10 @@ def main() -> None:
             "2) fill in your key\n3) re-run"
         )
     try:
-        from langchain_chroma import Chroma
         from langchain_core.documents import Document
         from langchain_openai import OpenAIEmbeddings
+        from langchain_qdrant import QdrantVectorStore
+        from qdrant_client import models
     except ImportError:
         sys.exit("Missing dependency. Run: pip install -r ../../requirements.txt")
 
@@ -44,7 +45,12 @@ def main() -> None:
         Document(page_content=text, metadata={"product": product})
         for text, product in PRODUCT_DOCS
     ]
-    vector_store = Chroma.from_documents(documents, embedding=embeddings)
+    vector_store = QdrantVectorStore.from_documents(
+        documents,
+        embedding=embeddings,
+        location=":memory:",
+        collection_name="phase3_topic06_metadata_filtering",
+    )
 
     print(f"Query: {QUERY!r}\n")
 
@@ -55,16 +61,28 @@ def main() -> None:
         print(f"  - ({doc.metadata['product']}) {doc.page_content}")
 
     # --- Filtered: only TrailBlazer 40L chunks are eligible, regardless of similarity ---
-    filtered = vector_store.similarity_search(
-        QUERY, k=2, filter={"product": "TrailBlazer 40L"}
+    trailblazer_filter = models.Filter(
+        must=[
+            models.FieldCondition(
+                key="metadata.product", match=models.MatchValue(value="TrailBlazer 40L")
+            )
+        ]
     )
+    filtered = vector_store.similarity_search(QUERY, k=2, filter=trailblazer_filter)
     print(f"\n[filtered: product=TrailBlazer 40L] top {len(filtered)} match(es):")
     for doc in filtered:
         print(f"  - ({doc.metadata['product']}) {doc.page_content}")
 
     # --- Same filter via the Retriever interface (Topic 05) ---
+    summitpro_filter = models.Filter(
+        must=[
+            models.FieldCondition(
+                key="metadata.product", match=models.MatchValue(value="SummitPro tent")
+            )
+        ]
+    )
     retriever = vector_store.as_retriever(
-        search_kwargs={"k": 2, "filter": {"product": "SummitPro tent"}}
+        search_kwargs={"k": 2, "filter": summitpro_filter}
     )
     via_retriever = retriever.invoke(QUERY)
     print(f"\n[retriever, filter: product=SummitPro tent] top {len(via_retriever)} match(es):")

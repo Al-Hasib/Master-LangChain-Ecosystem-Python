@@ -49,16 +49,18 @@ def main() -> None:
     require_openai_key()
     try:
         from langchain.chat_models import init_chat_model
-        from langchain_chroma import Chroma
         from langchain_core.documents import Document
         from langchain_openai import OpenAIEmbeddings
+        from langchain_qdrant import QdrantVectorStore
         from pydantic import BaseModel, Field
     except ImportError:
         sys.exit("Missing dependency. Run: pip install -r ../../requirements.txt")
 
     documents = [Document(page_content=text, metadata={"id": i}) for i, text in enumerate(NIMBUS_DOCS)]
     embeddings = OpenAIEmbeddings(model="text-embedding-3-small")
-    vectorstore = Chroma.from_documents(documents, embedding=embeddings)
+    vectorstore = QdrantVectorStore.from_documents(
+        documents, embedding=embeddings, location=":memory:", collection_name="phase4_relevance_grading"
+    )
     model = init_chat_model("gpt-4o-mini", model_provider="openai", temperature=0)
 
     class RelevanceGrade(BaseModel):

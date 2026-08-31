@@ -1,9 +1,9 @@
 """
 Phase 3 - Topic 04: Embeddings & Vector Stores
 
-Splits a document into chunks, embeds them into a PERSISTED Chroma store on disk,
-then reopens that same store in a fresh Chroma(...) call (no re-embedding) to prove
-persistence actually works - not just similarity_search on an in-memory store.
+Splits a document into chunks, embeds them into a PERSISTED Qdrant store on disk,
+then reopens that same store in a fresh QdrantVectorStore(...) call (no re-embedding)
+to prove persistence actually works - not just similarity_search on an in-memory store.
 
 Run:
     python code.py
@@ -25,7 +25,8 @@ TrailBlazer 40L backpack has a lifetime warranty against manufacturing defects. 
 support is available 9am-6pm Eastern Time, Monday through Friday."""
 
 QUERY = "What's the warranty on the backpack?"
-PERSIST_DIR = str(Path(__file__).parent / "chroma_db")
+PERSIST_DIR = str(Path(__file__).parent / "qdrant_db")
+COLLECTION_NAME = "phase3_topic04_embeddings"
 
 
 def main() -> None:
@@ -35,10 +36,11 @@ def main() -> None:
             "2) fill in your key\n3) re-run"
         )
     try:
-        from langchain_chroma import Chroma
         from langchain_core.documents import Document
         from langchain_openai import OpenAIEmbeddings
+        from langchain_qdrant import QdrantVectorStore
         from langchain_text_splitters import RecursiveCharacterTextSplitter
+        from qdrant_client import QdrantClient
     except ImportError:
         sys.exit("Missing dependency. Run: pip install -r ../../requirements.txt")
 
@@ -50,14 +52,20 @@ def main() -> None:
         # --- Build once: split -> embed -> persist to disk ---
         splitter = RecursiveCharacterTextSplitter(chunk_size=150, chunk_overlap=20)
         chunks = splitter.split_documents([Document(page_content=DOCUMENT_TEXT)])
-        vector_store = Chroma.from_documents(
-            chunks, embedding=embeddings, persist_directory=PERSIST_DIR
+        vector_store = QdrantVectorStore.from_documents(
+            chunks,
+            embedding=embeddings,
+            path=PERSIST_DIR,
+            collection_name=COLLECTION_NAME,
         )
         print(f"[first run] embedded {len(chunks)} chunk(s), persisted to {PERSIST_DIR}")
     else:
         # --- Reopen the SAME on-disk store - zero embedding calls for existing data ---
-        vector_store = Chroma(persist_directory=PERSIST_DIR, embedding_function=embeddings)
-        count = vector_store._collection.count()  # inspection only, not part of the public API
+        client = QdrantClient(path=PERSIST_DIR)
+        vector_store = QdrantVectorStore(
+            client=client, collection_name=COLLECTION_NAME, embedding=embeddings
+        )
+        count = vector_store.client.count(collection_name=COLLECTION_NAME).count
         print(f"[reopened] found {count} existing chunk(s) at {PERSIST_DIR}, no re-embedding")
 
     results = vector_store.similarity_search(QUERY, k=1)

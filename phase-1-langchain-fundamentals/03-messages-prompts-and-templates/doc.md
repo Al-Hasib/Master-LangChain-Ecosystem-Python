@@ -39,8 +39,7 @@ Topic 07 — steps piped together in a fixed order, as opposed to an agent loop.
 
 ## Minimal code
 
-`code.py` builds a `ChatPromptTemplate` with two variables, runs it through a `prompt |
-model` chain for three different variable sets, and separately builds the equivalent
+`code.py` builds a `ChatPromptTemplate` with two variables, runs it through a `prompt | model` chain for three different variable sets, and separately builds the equivalent
 message list by hand with typed message objects to show the two are interchangeable.
 
 ## Production notes

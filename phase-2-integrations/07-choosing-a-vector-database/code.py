@@ -12,7 +12,6 @@ from dataclasses import dataclass
 
 # Each store scored 0-2 on each dimension: higher is a better fit for that dimension.
 STORE_SCORES = {
-    "Chroma":   {"scale": 0, "low_ops": 2, "frequent_writes": 1, "rich_filtering": 1},
     "FAISS":    {"scale": 1, "low_ops": 2, "frequent_writes": 0, "rich_filtering": 0},
     "Qdrant":   {"scale": 2, "low_ops": 1, "frequent_writes": 2, "rich_filtering": 2},
     "Pinecone": {"scale": 2, "low_ops": 2, "frequent_writes": 2, "rich_filtering": 2},

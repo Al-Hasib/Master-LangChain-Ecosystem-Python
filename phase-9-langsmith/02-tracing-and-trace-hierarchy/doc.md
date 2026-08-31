@@ -43,7 +43,7 @@ Calling `rag_answer(...)` produces this shape in the LangSmith UI:
 ```text
 rag_answer                    (root run, run_type=chain)
 ├─ retrieve                   (child, run_type=retriever)
-│   └─ Chroma similarity_search  (auto-traced by the vector store integration)
+│   └─ Qdrant similarity_search  (auto-traced by the vector store integration)
 └─ ChatOpenAI                 (child, run_type=llm - auto-traced, shows the exact
                                 prompt sent and tokens used)
 ```
@@ -56,7 +56,7 @@ upstream of the model, not in the model.
 
 ## Minimal code
 
-`code.py` builds this course's smallest possible RAG pipeline, entirely in-code (Chroma,
+`code.py` builds this course's smallest possible RAG pipeline, entirely in-code (Qdrant,
 in-memory, no dependency on any other phase's files) — this doubles as the **Phase 9
 project**: a small RAG agent instrumented end-to-end. `retrieve` and `rag_answer` are
 both `@traceable`; `rag_answer` calls `retrieve` then an auto-traced `ChatOpenAI` call, so

@@ -45,10 +45,10 @@ def main() -> None:
         )
     try:
         from langchain.chat_models import init_chat_model
-        from langchain_chroma import Chroma
         from langchain_core.documents import Document
         from langchain_core.prompts import ChatPromptTemplate
         from langchain_openai import OpenAIEmbeddings
+        from langchain_qdrant import QdrantVectorStore
     except ImportError:
         sys.exit("Missing dependency. Run: pip install -r ../../requirements.txt")
 
@@ -57,7 +57,12 @@ def main() -> None:
 
     # --- Step 0 (one-time): embed + store, exactly Phase 2 Topic 06's pattern ---
     embeddings = OpenAIEmbeddings(model="text-embedding-3-small")
-    vector_store = Chroma.from_documents(documents, embedding=embeddings)
+    vector_store = QdrantVectorStore.from_documents(
+        documents,
+        embedding=embeddings,
+        location=":memory:",
+        collection_name="phase3_topic01_rag_overview",
+    )
 
     model = init_chat_model("gpt-4o-mini", model_provider="openai", temperature=0)
     prompt = ChatPromptTemplate.from_template(PROMPT_TEMPLATE)

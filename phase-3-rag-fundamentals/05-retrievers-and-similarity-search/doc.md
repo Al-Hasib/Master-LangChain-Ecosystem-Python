@@ -43,7 +43,7 @@ gracefully either way.
 
 ## Minimal code
 
-`code.py` builds one Chroma store, wraps it as a retriever two ways — default top-k and
+`code.py` builds one Qdrant store, wraps it as a retriever two ways — default top-k and
 score-threshold — and runs the *same* query through both `.invoke(...)` calls, printing
 result counts side by side so the difference in behavior is concrete, not theoretical.
 

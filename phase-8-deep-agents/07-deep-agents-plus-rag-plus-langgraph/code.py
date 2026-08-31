@@ -5,7 +5,7 @@ Run:
     python code.py
 
 Shows a retriever as "just another tool" in a deep agent's tools= list, reusing the
-small in-code Chroma pattern from Phase 0 Topic 06 / Phase 2 Topic 06. The LangGraph
+small in-code Qdrant pattern from Phase 0 Topic 06 / Phase 2 Topic 06. The LangGraph
 composition (embedding a deep agent as one node in a larger StateGraph) is left as an
 illustrative comment - Phase 6 owns real LangGraph code.
 """
@@ -31,9 +31,9 @@ def main() -> None:
     try:
         from langchain.chat_models import init_chat_model
         from langchain.tools import tool
-        from langchain_chroma import Chroma
         from langchain_core.documents import Document
         from langchain_openai import OpenAIEmbeddings
+        from langchain_qdrant import QdrantVectorStore
     except ImportError:
         sys.exit("Missing dependency. Run: pip install -r ../../requirements.txt")
     try:
@@ -43,7 +43,7 @@ def main() -> None:
 
     model = init_chat_model("gpt-4o-mini", model_provider="openai")
 
-    # --- Small in-code Chroma knowledge base (Phase 0 Topic 06 / Phase 2 Topic 06 pattern) ---
+    # --- Small in-code Qdrant knowledge base (Phase 0 Topic 06 / Phase 2 Topic 06 pattern) ---
     docs_text = [
         "Our return policy allows returns within 30 days of purchase.",
         "Premium plan subscribers get free shipping on all orders.",
@@ -51,7 +51,12 @@ def main() -> None:
     ]
     embeddings = OpenAIEmbeddings(model="text-embedding-3-small")
     documents = [Document(page_content=text) for text in docs_text]
-    vector_store = Chroma.from_documents(documents, embedding=embeddings)
+    vector_store = QdrantVectorStore.from_documents(
+        documents,
+        embedding=embeddings,
+        location=":memory:",
+        collection_name="company_policy_kb",
+    )
 
     @tool
     def search_knowledge_base(query: str) -> str:

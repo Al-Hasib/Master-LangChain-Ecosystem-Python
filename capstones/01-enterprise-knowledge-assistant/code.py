@@ -25,9 +25,9 @@ if not os.getenv("OPENAI_API_KEY"):
 
 try:
     from langchain.chat_models import init_chat_model
-    from langchain_chroma import Chroma
     from langchain_core.documents import Document
     from langchain_openai import OpenAIEmbeddings
+    from langchain_qdrant import QdrantVectorStore
     from langchain_text_splitters import RecursiveCharacterTextSplitter
     from pydantic import BaseModel, Field
 except ImportError:
@@ -99,7 +99,7 @@ def build_corpus() -> list[Document]:
     ]
 
 
-def build_vector_store(documents: list[Document]) -> Chroma:
+def build_vector_store(documents: list[Document]) -> QdrantVectorStore:
     # Phase 3 Topic 03: chunk before embedding. These docs are short (1-2 sentences)
     # so most become a single chunk each - the splitter still matters once real
     # multi-paragraph policy PDFs replace this in-code corpus.
@@ -107,7 +107,12 @@ def build_vector_store(documents: list[Document]) -> Chroma:
     chunks = splitter.split_documents(documents)
     embeddings = OpenAIEmbeddings(model="text-embedding-3-small")
     # Ephemeral in-memory client - see doc.md "What's simplified".
-    return Chroma.from_documents(chunks, embedding=embeddings)
+    return QdrantVectorStore.from_documents(
+        chunks,
+        embedding=embeddings,
+        location=":memory:",
+        collection_name="enterprise_knowledge_base",
+    )
 
 
 def grade_chunks(model, question: str, chunks: list[Document]) -> list[Document]:
@@ -129,7 +134,7 @@ def grade_chunks(model, question: str, chunks: list[Document]) -> list[Document]
     return kept
 
 
-def answer_question(model, store: Chroma, question: str, history: list[str]) -> str:
+def answer_question(model, store: QdrantVectorStore, question: str, history: list[str]) -> str:
     retriever = store.as_retriever(search_kwargs={"k": 4})
     retrieved = retriever.invoke(question)
     print(f"  Retrieved {len(retrieved)} chunk(s), grading for relevance:")

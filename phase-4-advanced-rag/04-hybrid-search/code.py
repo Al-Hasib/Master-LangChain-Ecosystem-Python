@@ -53,9 +53,9 @@ def show(label: str, docs) -> None:
 def main() -> None:
     require_openai_key()
     try:
-        from langchain_chroma import Chroma
         from langchain_core.documents import Document
         from langchain_openai import OpenAIEmbeddings
+        from langchain_qdrant import QdrantVectorStore
     except ImportError:
         sys.exit("Missing dependency. Run: pip install -r ../../requirements.txt")
 
@@ -79,7 +79,9 @@ def main() -> None:
 
     documents = [Document(page_content=text, metadata={"id": i}) for i, text in enumerate(NIMBUS_DOCS)]
     embeddings = OpenAIEmbeddings(model="text-embedding-3-small")
-    vectorstore = Chroma.from_documents(documents, embedding=embeddings)
+    vectorstore = QdrantVectorStore.from_documents(
+        documents, embedding=embeddings, location=":memory:", collection_name="phase4_hybrid_search"
+    )
 
     print(f"Query: {QUERY}")
 

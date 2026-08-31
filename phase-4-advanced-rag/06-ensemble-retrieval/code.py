@@ -52,9 +52,9 @@ def show(label: str, docs) -> None:
 def main() -> None:
     require_openai_key()
     try:
-        from langchain_chroma import Chroma
         from langchain_core.documents import Document
         from langchain_openai import OpenAIEmbeddings
+        from langchain_qdrant import QdrantVectorStore
         from langchain_text_splitters import RecursiveCharacterTextSplitter
     except ImportError:
         sys.exit("Missing dependency. Run: pip install -r ../../requirements.txt")
@@ -83,14 +83,14 @@ def main() -> None:
     # Retriever B: vector search over SMALL sub-chunks of each section (precision-tuned).
     small_splitter = RecursiveCharacterTextSplitter(chunk_size=80, chunk_overlap=0)
     small_chunks = small_splitter.split_documents(documents)
-    small_vectorstore = Chroma.from_documents(
-        small_chunks, embedding=embeddings, collection_name="small_chunks"
+    small_vectorstore = QdrantVectorStore.from_documents(
+        small_chunks, embedding=embeddings, location=":memory:", collection_name="phase4_ensemble_small_chunks"
     )
     small_retriever = small_vectorstore.as_retriever(search_kwargs={"k": 2})
 
     # Retriever C: vector search over the full (large) sections (context-tuned).
-    large_vectorstore = Chroma.from_documents(
-        documents, embedding=embeddings, collection_name="large_chunks"
+    large_vectorstore = QdrantVectorStore.from_documents(
+        documents, embedding=embeddings, location=":memory:", collection_name="phase4_ensemble_large_chunks"
     )
     large_retriever = large_vectorstore.as_retriever(search_kwargs={"k": 2})
 

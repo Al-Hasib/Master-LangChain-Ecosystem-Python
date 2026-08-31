@@ -100,7 +100,7 @@ Deep Research Agent → Production AI Application
 - **Frameworks:** LangChain, LangGraph, Deep Agents
 - **Observability:** LangSmith
 - **Models:** OpenAI (primary), Anthropic (alternative), Ollama (local)
-- **Vector DB:** Chroma / FAISS to start; Qdrant / pgvector shown later
+- **Vector DB:** Qdrant (embedded/local for lessons, server/cloud for production) / FAISS to start; pgvector shown later
 - **Database:** PostgreSQL
 - **API layer:** FastAPI
 - **Frontend (later phases):** Streamlit → custom web frontend

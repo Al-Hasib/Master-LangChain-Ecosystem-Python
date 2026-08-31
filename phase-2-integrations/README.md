@@ -13,9 +13,9 @@ then show how different providers implement it.
 03. [Local & Alternative Providers](03-local-and-alternative-providers/doc.md) — Ollama (local, private, free) and OpenRouter (provider-agnostic routing).
 04. [Document Loaders — Common Formats](04-document-loaders-common-formats/doc.md) — PDF, web pages, CSV, JSON, Markdown, SQL database rows as `Document` objects.
 05. [External Data Integrations](05-external-data-integrations/doc.md) — Google Drive, Notion, GitHub, Slack/generic REST APIs as data sources.
-06. [Vector Store Integration Pattern](06-vector-store-integration-pattern/doc.md) — Chroma, FAISS, Qdrant, Pinecone, pgvector behind the same `VectorStore` interface.
+06. [Vector Store Integration Pattern](06-vector-store-integration-pattern/doc.md) — Qdrant, FAISS, Pinecone, pgvector behind the same `VectorStore` interface.
 07. [Choosing a Vector Database](07-choosing-a-vector-database/doc.md) — local vs managed, cost, filtering, scale, hybrid-search support — decision framework.
-08. [Mini Project: Multi-Source Connector](08-mini-project-multi-source-connector/doc.md) — one ingestion pipeline that normalizes CSV + Markdown + GitHub API into the same `Document` schema and loads it into Chroma.
+08. [Mini Project: Multi-Source Connector](08-mini-project-multi-source-connector/doc.md) — one ingestion pipeline that normalizes CSV + Markdown + GitHub API into the same `Document` schema and loads it into Qdrant.
 
 ## Running the examples
 

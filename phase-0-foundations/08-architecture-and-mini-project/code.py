@@ -59,14 +59,31 @@ TOOLS = [
 ]
 
 
-def build_collection(chroma_client, embedding_fn):
-    collection = chroma_client.create_collection(
-        name="phase0_mini_project", embedding_function=embedding_fn
+COLLECTION_NAME = "phase0_mini_project"
+EMBEDDING_MODEL = "text-embedding-3-small"
+
+
+def embed(openai_client, texts: list[str]) -> list[list[float]]:
+    response = openai_client.embeddings.create(model=EMBEDDING_MODEL, input=texts)
+    return [item.embedding for item in response.data]
+
+
+def build_collection(qdrant_client, openai_client):
+    from qdrant_client.models import Distance, PointStruct, VectorParams
+
+    vectors = embed(openai_client, KNOWLEDGE_BASE)
+    qdrant_client.create_collection(
+        collection_name=COLLECTION_NAME,
+        vectors_config=VectorParams(size=len(vectors[0]), distance=Distance.COSINE),
     )
-    collection.add(
-        documents=KNOWLEDGE_BASE, ids=[f"kb-{i}" for i in range(len(KNOWLEDGE_BASE))]
+    qdrant_client.upsert(
+        collection_name=COLLECTION_NAME,
+        points=[
+            PointStruct(id=i, vector=vector, payload={"document": doc})
+            for i, (vector, doc) in enumerate(zip(vectors, KNOWLEDGE_BASE))
+        ],
     )
-    return collection
+    return qdrant_client
 
 
 def answer_question(openai_client, collection, question: str) -> dict:
@@ -89,8 +106,11 @@ def answer_question(openai_client, collection, question: str) -> dict:
     if message.tool_calls:
         call = message.tool_calls[0]
         query = json.loads(call.function.arguments)["query"]
-        results = collection.query(query_texts=[query], n_results=2)
-        context = "\n".join(results["documents"][0])
+        query_vector = embed(openai_client, [query])[0]
+        results = collection.query_points(
+            collection_name=COLLECTION_NAME, query=query_vector, limit=2
+        )
+        context = "\n".join(point.payload["document"] for point in results.points)
 
         messages.append(message)
         messages.append({"role": "tool", "tool_call_id": call.id, "content": context})
@@ -112,18 +132,14 @@ def main() -> None:
             "Missing OPENAI_API_KEY.\n1) cp .env.example .env\n2) fill in your key\n3) re-run"
         )
     try:
-        import chromadb
-        from chromadb.utils import embedding_functions
         from openai import OpenAI
+        from qdrant_client import QdrantClient
     except ImportError:
         sys.exit("Missing dependency. Run: pip install -r ../../requirements.txt")
 
     openai_client = OpenAI(api_key=api_key)
-    embedding_fn = embedding_functions.OpenAIEmbeddingFunction(
-        api_key=api_key, model_name="text-embedding-3-small"
-    )
-    chroma_client = chromadb.Client()
-    collection = build_collection(chroma_client, embedding_fn)
+    qdrant_client = QdrantClient(location=":memory:")
+    collection = build_collection(qdrant_client, openai_client)
 
     questions = [
         "What's your return policy?",

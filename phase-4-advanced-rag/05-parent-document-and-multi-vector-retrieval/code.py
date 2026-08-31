@@ -59,9 +59,9 @@ def require_openai_key() -> None:
 def main() -> None:
     require_openai_key()
     try:
-        from langchain_chroma import Chroma
         from langchain_core.documents import Document
         from langchain_openai import OpenAIEmbeddings
+        from langchain_qdrant import QdrantVectorStore
         from langchain_text_splitters import RecursiveCharacterTextSplitter
     except ImportError:
         sys.exit("Missing dependency. Run: pip install -r ../../requirements.txt")
@@ -78,7 +78,13 @@ def main() -> None:
     documents = [Document(page_content=RUNBOOK, metadata={"source": "deploy-runbook"})]
 
     embeddings = OpenAIEmbeddings(model="text-embedding-3-small")
-    vectorstore = Chroma(embedding_function=embeddings, collection_name="parent_doc_demo")
+    # Empty store up front - ParentDocumentRetriever.add_documents() populates it below,
+    # so we build the (client, collection) pair directly rather than via from_documents().
+    vectorstore = QdrantVectorStore.construct_instance(
+        embedding=embeddings,
+        client_options={"location": ":memory:"},
+        collection_name="phase4_parent_document",
+    )
 
     # Small child chunks get embedded and searched; larger parent chunks (one per
     # "Section") are what actually get returned once a child match is found.

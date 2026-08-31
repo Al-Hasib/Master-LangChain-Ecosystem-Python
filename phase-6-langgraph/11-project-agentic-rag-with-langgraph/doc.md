@@ -17,7 +17,7 @@ START ─► retrieve ─► grade_documents ──relevant?──yes──► g
               └──────── rewrite_query ◄─────┘
 ```
 
-- `retrieve` — runs a similarity search against a small in-code Chroma knowledge base
+- `retrieve` — runs a similarity search against a small in-code Qdrant knowledge base
   (Phase 3 Topic 05's retriever pattern) and stores the returned chunks in state.
 - `grade_documents` — one focused LLM call: "do these chunks actually answer the
   question?" → `"yes"` / `"no"`. This is the piece that's invisible inside a plain agent
@@ -32,7 +32,7 @@ START ─► retrieve ─► grade_documents ──relevant?──yes──► g
 ## Minimal code
 
 `code.py` builds a five-document in-code knowledge base about a fictional product with
-`Chroma.from_documents` + `OpenAIEmbeddings`, wires the graph above, and runs two
+`QdrantVectorStore.from_documents` + `OpenAIEmbeddings`, wires the graph above, and runs two
 questions: one that's answerable directly from the knowledge base (grades relevant on the
 first pass) and one deliberately vague question that's expected to trigger at least one
 `rewrite_query` loop before generating.

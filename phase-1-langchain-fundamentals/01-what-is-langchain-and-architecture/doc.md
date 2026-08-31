@@ -3,7 +3,7 @@
 ## Problem
 
 Phase 0's mini project (~140 lines) hand-rolled: a tool-calling round trip, a
-Chroma-backed lookup, and JSON-schema output — for one tool and one question. That
+Qdrant-backed lookup, and JSON-schema output — for one tool and one question. That
 doesn't scale to real applications with many tools, longer loops, and provider
 switching. LangChain exists to remove that repetition.
 

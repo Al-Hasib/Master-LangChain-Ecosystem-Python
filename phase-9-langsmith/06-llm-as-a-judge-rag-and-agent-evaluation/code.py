@@ -37,9 +37,9 @@ def main() -> None:
         from langchain.agents import create_agent
         from langchain.chat_models import init_chat_model
         from langchain.tools import tool
-        from langchain_chroma import Chroma
         from langchain_core.documents import Document
         from langchain_openai import OpenAIEmbeddings
+        from langchain_qdrant import QdrantVectorStore
         from pydantic import BaseModel, Field
     except ImportError:
         sys.exit("Missing dependency. Run: pip install -r ../../requirements.txt")
@@ -63,7 +63,12 @@ def main() -> None:
     # --- Judge 1: groundedness, on a minimal RAG pipeline ----------------------
     embeddings = OpenAIEmbeddings(model="text-embedding-3-small")
     documents = [Document(page_content=text) for text in DOCS_TEXT]
-    vectorstore = Chroma.from_documents(documents, embedding=embeddings)
+    vectorstore = QdrantVectorStore.from_documents(
+        documents,
+        embedding=embeddings,
+        location=":memory:",
+        collection_name="judge_eval_kb",
+    )
 
     retrieved = vectorstore.similarity_search(RAG_QUESTION, k=2)
     context = "\n".join(doc.page_content for doc in retrieved)

@@ -2,10 +2,10 @@
 
 ## Problem
 
-Phase 0 Topic 06 used Chroma directly, with Chroma-specific method names
-(`collection.add`, `collection.query`). If every part of your app calls those specific
-methods, switching to FAISS or Qdrant later means rewriting every call site — the exact
-problem Topic 01 solved for models, now for vector stores.
+Phase 0 Topic 06 used Qdrant's low-level client directly, with Qdrant-specific method
+names (`client.upsert`, `client.query_points`). If every part of your app calls those
+specific methods, switching to FAISS or another store later means rewriting every call
+site — the exact problem Topic 01 solved for models, now for vector stores.
 
 ## Concept
 
@@ -18,19 +18,21 @@ vector_store.similarity_search_with_score(query, k=4)    # retrieve + relevance 
 retriever = vector_store.as_retriever()                 # Retriever interface (Phase 3)
 ```
 
-Every backend — `Chroma`, `FAISS`, `Qdrant`, `PineconeVectorStore`, `PGVector` — exposes
+Every backend — `QdrantVectorStore`, `FAISS`, `PineconeVectorStore`, `PGVector` — exposes
 this same surface, constructed slightly differently (local path vs. connection string vs.
 API key) but used identically afterward:
 
 ```python
-from langchain_chroma import Chroma
+from langchain_qdrant import QdrantVectorStore
 from langchain_community.vectorstores import FAISS
 
-chroma_store = Chroma.from_documents(documents, embedding=embeddings)
+qdrant_store = QdrantVectorStore.from_documents(
+    documents, embedding=embeddings, location=":memory:", collection_name="demo"
+)
 faiss_store  = FAISS.from_documents(documents, embedding=embeddings)
 
 # identical calls from here on, regardless of which store `store` is:
-chroma_store.similarity_search("query", k=2)
+qdrant_store.similarity_search("query", k=2)
 faiss_store.similarity_search("query", k=2)
 ```
 
@@ -40,7 +42,7 @@ exactly like swapping model providers in Topic 01.
 
 ## Minimal code
 
-`code.py` embeds the same small document set into both Chroma and FAISS (both local, no
+`code.py` embeds the same small document set into both Qdrant and FAISS (both local, no
 extra infra) using the exact same `.from_documents(...)` / `.similarity_search(...)`
 calls, printing results from each side by side to make the interface parity concrete.
 
@@ -61,5 +63,5 @@ vector store doesn't.
 
 ## Mini challenge
 
-Add `Qdrant` (via `langchain-qdrant`, running Qdrant's free local Docker image or
-in-memory mode) as a third backend and confirm the same calls work unchanged.
+Add `PineconeVectorStore` (via `langchain-pinecone`, using Pinecone's free tier) as a
+third backend and confirm the same calls work unchanged.

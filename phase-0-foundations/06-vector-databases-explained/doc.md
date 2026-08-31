@@ -20,10 +20,15 @@ doesn't:
    documents where `source = 'handbook.pdf'`").
 
 Two families you'll use in this course:
-- **Local/embedded** (Chroma, FAISS) — run in-process or as a local server, zero infra,
-  great for development and small-to-medium datasets.
-- **Managed/distributed** (Pinecone, Qdrant, pgvector-on-Postgres) — built for
+- **Local/embedded** (Qdrant in local mode, FAISS) — run in-process or as a local
+  server, zero infra, great for development and small-to-medium datasets.
+- **Managed/distributed** (Qdrant Cloud, Pinecone, pgvector-on-Postgres) — built for
   production scale, often add hybrid search and richer filtering.
+
+This course uses **Qdrant** throughout: it runs embedded/local (no server, just like
+Chroma or FAISS) for every lesson here, and the exact same client code points at a
+self-hosted or Qdrant Cloud deployment when you're ready for production — no rewrite
+needed, unlike swapping from an embedded-only store to a managed one.
 
 ```text
 Document -> Embedding model -> vector ---\
@@ -41,16 +46,16 @@ exactly what Phase 3's "RAG" pattern automates with LangChain's `VectorStore` an
 
 ## Minimal code
 
-`code.py` uses Chroma (local, no server needed) to store the same 5 sentences from
+`code.py` uses Qdrant (local, no server needed) to store the same 5 sentences from
 Topic 05 with metadata, then runs a similarity search — showing the same ranking Topic
 05 computed by hand, now via a real vector database in ~10 lines.
 
 ## Production notes
 
-Chroma/FAISS are fine through early production; move to a managed/distributed store
-when you need: multi-machine scale, high write throughput, built-in hybrid search, or
-zero-ops hosting. Choosing one is covered properly in Phase 2's "Choosing a Vector
-Database" topic.
+Qdrant/FAISS are fine through early production; move to a managed/distributed
+deployment when you need: multi-machine scale, high write throughput, built-in hybrid
+search, or zero-ops hosting. Choosing one is covered properly in Phase 2's "Choosing a
+Vector Database" topic.
 
 ## Debugging
 

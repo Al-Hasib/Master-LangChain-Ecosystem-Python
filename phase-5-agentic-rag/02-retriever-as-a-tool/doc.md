@@ -46,7 +46,7 @@ being answered directly or with a different tool (Topic 03 adds more).
 
 ## Minimal code
 
-`code.py` builds a Chroma retriever over the same Aurora knowledge base as Topic 01,
+`code.py` builds a Qdrant retriever over the same Aurora knowledge base as Topic 01,
 wraps it with `create_retriever_tool` in one line, and gives an agent *only* that tool.
 It asks one on-topic question and one off-topic question (a plain greeting) to show the
 agent calling the tool only when relevant — exactly Topic 01's behavior, with less code.

@@ -2,7 +2,7 @@
 Phase 3 - Topic 03: Text Splitting & Chunking Strategies
 
 Splits the SAME document two ways (coarse vs. fine chunk_size), embeds each version
-into its own Chroma store, and compares the top retrieval result - showing chunking
+into its own Qdrant store, and compares the top retrieval result - showing chunking
 choices change retrieval quality, not just chunk count.
 
 Run:
@@ -43,16 +43,23 @@ within one business day."""
 QUERY = "How long do refunds take?"
 
 
-def split_and_store(text: str, chunk_size: int, chunk_overlap: int, embeddings):
-    from langchain_chroma import Chroma
+def split_and_store(
+    text: str, chunk_size: int, chunk_overlap: int, embeddings, collection_name: str
+):
     from langchain_core.documents import Document
+    from langchain_qdrant import QdrantVectorStore
     from langchain_text_splitters import RecursiveCharacterTextSplitter
 
     splitter = RecursiveCharacterTextSplitter(
         chunk_size=chunk_size, chunk_overlap=chunk_overlap
     )
     chunks = splitter.split_documents([Document(page_content=text)])
-    store = Chroma.from_documents(chunks, embedding=embeddings)
+    store = QdrantVectorStore.from_documents(
+        chunks,
+        embedding=embeddings,
+        location=":memory:",
+        collection_name=collection_name,
+    )
     return chunks, store
 
 
@@ -70,10 +77,14 @@ def main() -> None:
     embeddings = OpenAIEmbeddings(model="text-embedding-3-small")
 
     # --- Coarse: big chunks, no overlap - most facts end up bundled together ---
-    coarse_chunks, coarse_store = split_and_store(LONG_DOCUMENT, 800, 0, embeddings)
+    coarse_chunks, coarse_store = split_and_store(
+        LONG_DOCUMENT, 800, 0, embeddings, "phase3_topic03_coarse"
+    )
 
     # --- Fine: small chunks, some overlap - closer to one fact per chunk ---
-    fine_chunks, fine_store = split_and_store(LONG_DOCUMENT, 150, 20, embeddings)
+    fine_chunks, fine_store = split_and_store(
+        LONG_DOCUMENT, 150, 20, embeddings, "phase3_topic03_fine"
+    )
 
     print(f"Coarse split: {len(coarse_chunks)} chunk(s) (chunk_size=800, overlap=0)")
     print(f"Fine split:   {len(fine_chunks)} chunk(s) (chunk_size=150, overlap=20)\n")

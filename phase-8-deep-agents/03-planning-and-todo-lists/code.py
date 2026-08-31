@@ -46,7 +46,7 @@ def main() -> None:
     def lookup_fact(topic: str) -> str:
         """Look up one fact about a topic from a small offline reference."""
         facts = {
-            "chroma": "Chroma is an open-source embedded vector database.",
+            "pinecone": "Pinecone is a managed, cloud-native vector database.",
             "faiss": "FAISS is Meta's library for fast similarity search.",
             "qdrant": "Qdrant is a vector database with strong filtering support.",
         }
@@ -65,7 +65,7 @@ def main() -> None:
     )
 
     question = (
-        "Look up facts about chroma, faiss, and qdrant, then write a one-sentence "
+        "Look up facts about pinecone, faiss, and qdrant, then write a one-sentence "
         "comparison of the three."
     )
     result = agent.invoke({"messages": [{"role": "user", "content": question}]})

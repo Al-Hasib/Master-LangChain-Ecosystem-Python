@@ -1,7 +1,7 @@
 """
 Phase 2 - Topic 08 (Mini Project): Multi-Source Connector
 
-CSV + Markdown + GitHub API -> normalized metadata schema -> one Chroma collection.
+CSV + Markdown + GitHub API -> normalized metadata schema -> one Qdrant collection.
 
 Run:
     python code.py
@@ -82,8 +82,8 @@ def main() -> None:
             "2) fill in your key\n3) re-run"
         )
     try:
-        from langchain_chroma import Chroma
         from langchain_openai import OpenAIEmbeddings
+        from langchain_qdrant import QdrantVectorStore
     except ImportError:
         sys.exit("Missing dependency. Run: pip install -r ../../requirements.txt")
 
@@ -103,7 +103,12 @@ def main() -> None:
         print(f"  - {doc.metadata['source_type']:12s} {doc.metadata['source_name']}")
 
     embeddings = OpenAIEmbeddings(model="text-embedding-3-small")
-    store = Chroma.from_documents(all_documents, embedding=embeddings)
+    store = QdrantVectorStore.from_documents(
+        all_documents,
+        embedding=embeddings,
+        location=":memory:",
+        collection_name="phase2_multi_source_connector",
+    )
 
     query = "How does refund and support handling work?"
     print(f"\nQuery: {query!r}")

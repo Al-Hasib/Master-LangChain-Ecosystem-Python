@@ -36,7 +36,7 @@ In-code corpus (policy + handbook docs, normalized metadata)
 RecursiveCharacterTextSplitter          <- Phase 3 Topic 03
         │
         ▼
-OpenAIEmbeddings -> Chroma collection    <- Phase 3 Topic 04
+OpenAIEmbeddings -> Qdrant collection    <- Phase 3 Topic 04
         │
         ▼
 retriever.invoke(question)  (top-k)      <- Phase 3 Topic 05
@@ -76,7 +76,7 @@ pipeline run in-process against the OpenAI API only.
   graded irrelevant. Here, if every retrieved chunk fails the grade, the assistant just
   says so honestly instead of guessing — good enough to prove the grounding check works,
   but not the full self-correction loop (that's Capstone 02's job).
-- **Conversation memory is a plain Python list**, not `Chroma`-backed long-term memory or
+- **Conversation memory is a plain Python list**, not `Qdrant`-backed long-term memory or
   a summarizing buffer. It's enough to show the assistant using prior turns, not enough
   for a long-running multi-session assistant.
 - **The corpus is small and lives in code** (12 short documents) so the example runs
@@ -84,7 +84,7 @@ pipeline run in-process against the OpenAI API only.
   ingest hundreds of PDFs/Confluence pages/etc. via the loaders in Phase 3 Topic 02.
 - **No reranking, hybrid search, or evaluation harness** (Phase 4 Topics 03/04/08,
   Phase 9) — this capstone is retrieval + grading + citation only.
-- **Chroma runs in-memory (ephemeral client)** — a real deployment would persist it or
+- **Qdrant runs in-memory (ephemeral client)** — a real deployment would persist it or
   use a hosted vector DB.
 
 ## Extend it further
@@ -93,5 +93,5 @@ pipeline run in-process against the OpenAI API only.
   grade, rewrite the question and retry retrieval once before giving up (Phase 4 Topic 07).
 - Add a second retriever filtered by `source_type` and let the assistant pick which one
   to search based on the question (a preview of Capstone 02's agentic retrieval).
-- Persist the Chroma collection to disk and add a LangSmith-traced evaluation dataset
+- Persist the Qdrant collection to disk and add a LangSmith-traced evaluation dataset
   (Phase 9) that checks citation accuracy across a fixed set of questions.

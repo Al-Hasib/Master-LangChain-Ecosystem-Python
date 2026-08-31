@@ -42,7 +42,7 @@ a `source` field. It reuses ideas from every prior topic in this phase:
 
 - Chat model call with a system message (Topics 01, 03)
 - Tool calling for the retrieval decision (Topic 04)
-- A Chroma-backed knowledge base (Topic 06)
+- A Qdrant-backed knowledge base (Topic 06)
 - Structured JSON output for the final answer (Topic 04)
 
 This is deliberately close to what Phase 1's `create_agent` will do in ~10 lines instead

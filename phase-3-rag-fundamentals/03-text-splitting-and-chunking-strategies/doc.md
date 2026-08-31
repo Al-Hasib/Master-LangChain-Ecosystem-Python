@@ -48,7 +48,7 @@ one Document (2000 chars, covers returns + shipping + refunds)
 `code.py` builds one longer synthetic document mixing five unrelated policy facts into
 continuous prose, then splits it two ways: `chunk_size=800, overlap=0` (coarse — most
 facts end up bundled together) vs. `chunk_size=150, overlap=20` (fine-grained — closer
-to one fact per chunk). Both versions get embedded into separate Chroma stores and
+to one fact per chunk). Both versions get embedded into separate Qdrant stores and
 queried with the same question, printing the top match from each so you can see the
 coarse version's top chunk drag in unrelated text while the fine version's top chunk is
 tightly on-topic.

@@ -11,29 +11,46 @@ semantic ranking.
 
 ## Concept
 
-Chroma (via `langchain_chroma`) accepts a `filter` argument on `similarity_search`, and
-the equivalent `search_kwargs={"filter": ...}` on a retriever (Topic 05):
+`QdrantVectorStore` (via `langchain_qdrant`) accepts a `filter` argument on
+`similarity_search`, and the equivalent `search_kwargs={"filter": ...}` on a retriever
+(Topic 05). Unlike a plain dict, the filter is a `qdrant_client.models.Filter` object —
+Qdrant's native filter syntax, passed straight through:
 
 ```python
-vector_store.similarity_search(query, k=3, filter={"category": "product"})
+from qdrant_client import models
+
+category_filter = models.Filter(
+    must=[models.FieldCondition(key="metadata.category", match=models.MatchValue(value="product"))]
+)
+
+vector_store.similarity_search(query, k=3, filter=category_filter)
 
 retriever = vector_store.as_retriever(
-    search_kwargs={"k": 3, "filter": {"category": "product"}}
+    search_kwargs={"k": 3, "filter": category_filter}
 )
 ```
 
-The filter dict has two forms. A plain `{"key": "value"}` is shorthand for exact-match
-equality. For multiple conditions or operators other than equality, use Chroma's
-explicit operator syntax:
+Note the `"metadata."` prefix on the key — `QdrantVectorStore` nests each LangChain
+`Document`'s `metadata` dict under a `metadata` payload key on the stored point, so a
+filter on `category` targets `metadata.category`, not a bare top-level `category` field.
+
+A single condition is a `Filter` with one `FieldCondition` in `must=[...]`. For multiple
+AND conditions, add more entries to the same `must` list; for OR, use `should=[...]`
+instead:
 
 ```python
-{"$and": [{"category": {"$eq": "policy"}}, {"topic": {"$eq": "returns"}}]}
+models.Filter(
+    must=[
+        models.FieldCondition(key="metadata.category", match=models.MatchValue(value="policy")),
+        models.FieldCondition(key="metadata.topic", match=models.MatchValue(value="returns")),
+    ]
+)
 ```
 
-Supported operators include `$eq`, `$ne`, `$gt`, `$gte`, `$lt`, `$lte`, combined with
-`$and` / `$or`. The filter is applied *as part of* the nearest-neighbor search, not as a
-separate pass afterward — so it narrows the search space instead of just discarding
-results after the fact.
+`FieldCondition` also supports range conditions (`models.Range(gt=..., gte=..., lt=...,
+lte=...)`) alongside `match` for equality. The filter is applied *as part of* the
+nearest-neighbor search, not as a separate pass afterward — so it narrows the search
+space instead of just discarding results after the fact.
 
 ```text
 query embedding
@@ -50,8 +67,8 @@ top-k results, all guaranteed to match the filter AND rank by similarity
 `code.py` builds a small two-product corpus where both products' chunks mention
 "warranty" (deliberately overlapping vocabulary), tagged with `metadata={"product": "..."}`.
 It runs the same query once unfiltered (both products' chunks are candidates) and once
-with `filter={"product": "TrailBlazer 40L"}`, printing both result sets so the narrowing
-effect is visible.
+with a `models.Filter` matching `metadata.product == "TrailBlazer 40L"`, printing both
+result sets so the narrowing effect is visible.
 
 ## Production notes
 
@@ -64,12 +81,14 @@ often a hard *security* boundary, not just a relevance nicety — get it right.
 
 - Filter returns zero results even though matching documents exist → metadata values are
   matched exactly and are case-sensitive; `"TrailBlazer 40L"` won't match `"trailblazer 40l"`.
-- `$and`/`$or` filter raises an error → each condition must be its own single-key dict
-  inside the list — `{"$and": [{"a": {"$eq": 1}}, {"b": {"$eq": 2}}]}`, not a single
-  multi-key dict.
+  Also double-check the key has the `metadata.` prefix — `key="product"` silently
+  matches nothing because the payload field is actually `metadata.product`.
+- `Filter` raises a validation error → each condition must be its own `FieldCondition`
+  inside the `must=[...]` (or `should=[...]`) list, not a raw dict — construct it with
+  `qdrant_client.models`, not hand-rolled JSON.
 
 ## Mini challenge
 
-Add a third product and write a `$or` filter that matches two of the three products at
-once, confirming the unfiltered document count minus the matched count equals the
-excluded product's chunk count.
+Add a third product and write a filter using `should=[...]` (Qdrant's OR) that matches
+two of the three products at once, confirming the unfiltered document count minus the
+matched count equals the excluded product's chunk count.

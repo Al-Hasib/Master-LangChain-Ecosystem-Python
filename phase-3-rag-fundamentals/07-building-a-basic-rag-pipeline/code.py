@@ -99,10 +99,10 @@ def main() -> None:
         )
     try:
         from langchain.chat_models import init_chat_model
-        from langchain_chroma import Chroma
         from langchain_community.document_loaders import PyPDFLoader
         from langchain_core.prompts import ChatPromptTemplate
         from langchain_openai import OpenAIEmbeddings
+        from langchain_qdrant import QdrantVectorStore
         from langchain_text_splitters import RecursiveCharacterTextSplitter
     except ImportError:
         sys.exit("Missing dependency. Run: pip install -r ../../requirements.txt")
@@ -129,8 +129,13 @@ def main() -> None:
 
         # 3) EMBEDDINGS + 4) VECTOR DB (Topic 04)
         embeddings = OpenAIEmbeddings(model="text-embedding-3-small")
-        vector_store = Chroma.from_documents(chunks, embedding=embeddings)
-        print("[3-4/6 embeddings+store] chunks embedded and indexed in Chroma")
+        vector_store = QdrantVectorStore.from_documents(
+            chunks,
+            embedding=embeddings,
+            location=":memory:",
+            collection_name="phase3_topic07_rag_pipeline",
+        )
+        print("[3-4/6 embeddings+store] chunks embedded and indexed in Qdrant")
 
         # 5) RETRIEVER (Topic 05)
         retriever = vector_store.as_retriever(search_kwargs={"k": 3})

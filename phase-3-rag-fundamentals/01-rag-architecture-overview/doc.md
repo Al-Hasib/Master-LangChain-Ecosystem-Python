@@ -44,7 +44,7 @@ loader machinery — real files and the `Document` object's shape are Topic 02.
 ## Minimal code
 
 `code.py` wraps five facts about a fictional outdoor-gear company in `Document` objects,
-embeds them into an in-memory Chroma store (Phase 2 Topic 06's `.from_documents` /
+embeds them into an in-memory Qdrant store (Phase 2 Topic 06's `.from_documents` /
 `.similarity_search` pattern), then answers two questions: one the corpus can answer,
 and one it can't — showing retrieval-then-generation end to end, including the case
 where retrieval legitimately comes up empty of useful content.

@@ -11,7 +11,7 @@ shape — `Document` in, `Document` out.
 
 ```text
 CSV file  ──┐
-Markdown  ──┼─► loader.load() ─► list[Document] ─► normalize metadata ─► Chroma
+Markdown  ──┼─► loader.load() ─► list[Document] ─► normalize metadata ─► Qdrant
 GitHub API──┘         (Topic 04/05)      (this project)      (Topic 06)
 ```
 
@@ -26,7 +26,7 @@ to every document regardless of where it came from, so a later filtered search (
 
 `code.py` pulls from three sources — a local CSV (policies), a local Markdown file
 (handbook), and the GitHub README adapter from Topic 05 — normalizes each source's
-documents to the shared metadata schema, loads everything into one Chroma collection,
+documents to the shared metadata schema, loads everything into one Qdrant collection,
 and runs a similarity search that could only be answered by combining knowledge from
 more than one source's documents.
 

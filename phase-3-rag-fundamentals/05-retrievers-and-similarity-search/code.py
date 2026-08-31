@@ -1,7 +1,7 @@
 """
 Phase 3 - Topic 05: Retrievers & Similarity Search
 
-Wraps the same Chroma store as a Retriever two ways - fixed top-k, and
+Wraps the same Qdrant store as a Retriever two ways - fixed top-k, and
 score-threshold - and runs the same query through both .invoke() calls to compare
 result counts and behavior.
 
@@ -34,15 +34,20 @@ def main() -> None:
             "2) fill in your key\n3) re-run"
         )
     try:
-        from langchain_chroma import Chroma
         from langchain_core.documents import Document
         from langchain_openai import OpenAIEmbeddings
+        from langchain_qdrant import QdrantVectorStore
     except ImportError:
         sys.exit("Missing dependency. Run: pip install -r ../../requirements.txt")
 
     embeddings = OpenAIEmbeddings(model="text-embedding-3-small")
     documents = [Document(page_content=text) for text in CORPUS]
-    vector_store = Chroma.from_documents(documents, embedding=embeddings)
+    vector_store = QdrantVectorStore.from_documents(
+        documents,
+        embedding=embeddings,
+        location=":memory:",
+        collection_name="phase3_topic05_retrievers",
+    )
 
     # --- Mode 1: fixed top-k - ALWAYS returns exactly k results ---
     topk_retriever = vector_store.as_retriever(search_kwargs={"k": 3})

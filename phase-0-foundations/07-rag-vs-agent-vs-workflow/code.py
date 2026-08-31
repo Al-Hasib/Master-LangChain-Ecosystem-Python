@@ -24,22 +24,45 @@ KNOWLEDGE_BASE = [
 ]
 
 
-def build_collection(client, embedding_fn):
-    import chromadb  # noqa: F401 (imported for clarity of dependency; client passed in)
+COLLECTION_NAME = "phase0_rag_demo"
+EMBEDDING_MODEL = "text-embedding-3-small"
 
-    collection = client.create_collection(
-        name="phase0_rag_demo", embedding_function=embedding_fn
+
+def embed(openai_client, texts: list[str]) -> list[list[float]]:
+    response = openai_client.embeddings.create(model=EMBEDDING_MODEL, input=texts)
+    return [item.embedding for item in response.data]
+
+
+def build_collection(qdrant_client, openai_client):
+    from qdrant_client.models import Distance, PointStruct, VectorParams
+
+    vectors = embed(openai_client, KNOWLEDGE_BASE)
+    qdrant_client.create_collection(
+        collection_name=COLLECTION_NAME,
+        vectors_config=VectorParams(size=len(vectors[0]), distance=Distance.COSINE),
     )
-    collection.add(
-        documents=KNOWLEDGE_BASE, ids=[f"kb-{i}" for i in range(len(KNOWLEDGE_BASE))]
+    qdrant_client.upsert(
+        collection_name=COLLECTION_NAME,
+        points=[
+            PointStruct(id=i, vector=vector, payload={"document": doc})
+            for i, (vector, doc) in enumerate(zip(vectors, KNOWLEDGE_BASE))
+        ],
     )
-    return collection
+    return qdrant_client
+
+
+def query_collection(openai_client, collection, query: str, n_results: int) -> list[str]:
+    query_vector = embed(openai_client, [query])[0]
+    results = collection.query_points(
+        collection_name=COLLECTION_NAME, query=query_vector, limit=n_results
+    )
+    return [point.payload["document"] for point in results.points]
 
 
 def fixed_rag_workflow(openai_client, collection, question: str) -> str:
     """Workflow shape: retrieval ALWAYS happens, no matter the question."""
-    results = collection.query(query_texts=[question], n_results=2)
-    context = "\n".join(results["documents"][0])
+    documents = query_collection(openai_client, collection, question, n_results=2)
+    context = "\n".join(documents)
     response = openai_client.chat.completions.create(
         model="gpt-4o-mini",
         messages=[
@@ -52,7 +75,7 @@ def fixed_rag_workflow(openai_client, collection, question: str) -> str:
         ],
         max_tokens=80,
     )
-    return f"[retrieved {len(results['documents'][0])} docs] {response.choices[0].message.content}"
+    return f"[retrieved {len(documents)} docs] {response.choices[0].message.content}"
 
 
 def agent_decision_step(openai_client, collection, question: str) -> str:
@@ -83,8 +106,8 @@ def agent_decision_step(openai_client, collection, question: str) -> str:
 
     call = message.tool_calls[0]
     query = json.loads(call.function.arguments)["query"]
-    results = collection.query(query_texts=[query], n_results=2)
-    context = "\n".join(results["documents"][0])
+    documents = query_collection(openai_client, collection, query, n_results=2)
+    context = "\n".join(documents)
 
     messages.append(message)
     messages.append({"role": "tool", "tool_call_id": call.id, "content": context})
@@ -99,18 +122,14 @@ def main() -> None:
             "Missing OPENAI_API_KEY.\n1) cp .env.example .env\n2) fill in your key\n3) re-run"
         )
     try:
-        import chromadb
-        from chromadb.utils import embedding_functions
         from openai import OpenAI
+        from qdrant_client import QdrantClient
     except ImportError:
         sys.exit("Missing dependency. Run: pip install -r ../../requirements.txt")
 
     openai_client = OpenAI(api_key=api_key)
-    embedding_fn = embedding_functions.OpenAIEmbeddingFunction(
-        api_key=api_key, model_name="text-embedding-3-small"
-    )
-    chroma_client = chromadb.Client()
-    collection = build_collection(chroma_client, embedding_fn)
+    qdrant_client = QdrantClient(location=":memory:")
+    collection = build_collection(qdrant_client, openai_client)
 
     questions = [
         "What's your return policy?",

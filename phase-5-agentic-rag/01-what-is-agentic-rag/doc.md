@@ -37,7 +37,7 @@ introduced, now aimed at retrieval specifically.
 
 ## Minimal code
 
-`code.py` builds one small Chroma-backed knowledge base (Aurora Cloud Analytics'
+`code.py` builds one small Qdrant-backed knowledge base (Aurora Cloud Analytics'
 policies) and answers two questions two ways: `fixed_rag_workflow` (always retrieves)
 and an agent built with `create_agent` given a retrieval tool (decides whether to
 retrieve). One question needs the knowledge base; one ("what's 12 times 7?") doesn't —

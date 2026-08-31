@@ -17,8 +17,8 @@ Five questions settle most of the decision:
    pgvector-on-Postgres you already run) vs. want zero-ops (Pinecone, a managed Qdrant
    Cloud).
 3. **Write pattern** — mostly static/batch-loaded (FAISS is fine, even though it has
-   weaker update/delete support) vs. frequent inserts/updates/deletes (Chroma, Qdrant,
-   pgvector handle this far better).
+   weaker update/delete support) vs. frequent inserts/updates/deletes (Qdrant, pgvector
+   handle this far better).
 4. **Filtering needs** — simple or none (any store) vs. rich metadata filtering combined
    with vector search (Qdrant, pgvector, Pinecone are strongest here).
 5. **Existing infrastructure** — already running Postgres? `pgvector` avoids adding a
@@ -27,14 +27,16 @@ Five questions settle most of the decision:
 
 | Store | Best fit | Ops | Notes |
 |---|---|---|---|
-| Chroma | prototyping, small-medium apps | none (embedded) | easiest to start with |
 | FAISS | static/batch datasets, research | none (embedded) | weakest update/delete support |
-| Qdrant | production, rich filtering | self-host or managed | strong hybrid search support |
+| Qdrant | prototyping through production, rich filtering | embedded/local or self-host or managed | runs embedded for dev, same client code scales to server/cloud |
 | Pinecone | production, zero-ops | fully managed | usage-based pricing |
 | pgvector | teams already on Postgres | whatever you already run | one less system to operate |
 
-**Default recommendation for this course:** start with Chroma (Phase 3–4 default),
-move to Qdrant or pgvector when a real deployment need shows up (Phase 10).
+**Default recommendation for this course:** this course adopts **Qdrant** throughout
+(Phase 3–4 onward) — it runs embedded/local with zero infra for every hands-on lesson,
+supports rich metadata filtering out of the box, and the exact same client code points
+at a self-hosted or Qdrant Cloud deployment once a real production need shows up (Phase
+10), so there's no rewrite when you scale.
 
 ## Minimal code
 
